@@ -578,15 +578,9 @@ llvm::Optional<FileDigest> digestFile(const SourceManager &SM, FileID FID) {
 format::FormatStyle getFormatStyleForFile(llvm::StringRef File,
                                           llvm::StringRef Content,
                                           const ThreadsafeFS &TFS) {
-  auto Style = format::getStyle(format::DefaultFormatStyle, File,
-                                format::DefaultFallbackStyle, Content,
-                                TFS.view(/*CWD=*/llvm::None).get());
-  if (!Style) {
-    log("getStyle() failed for file {0}: {1}. Fallback is LLVM style.", File,
-        Style.takeError());
-    return format::getLLVMStyle();
-  }
-  return *Style;
+  auto Style = format::getNoStyle();
+
+  return Style;
 }
 
 llvm::Expected<tooling::Replacements>

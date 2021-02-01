@@ -333,15 +333,11 @@ void ClangdServer::formatOnType(PathRef File, llvm::StringRef Code,
   auto Action = [File = File.str(), Code = Code.str(),
                  TriggerText = TriggerText.str(), CursorPos = *CursorPos,
                  CB = std::move(CB), this]() mutable {
-    auto Style = format::getStyle(format::DefaultFormatStyle, File,
-                                  format::DefaultFallbackStyle, Code,
-                                  TFS.view(/*CWD=*/llvm::None).get());
-    if (!Style)
-      return CB(Style.takeError());
+    auto Style = format::getNoStyle();
 
     std::vector<TextEdit> Result;
     for (const tooling::Replacement &R :
-         formatIncremental(Code, CursorPos, TriggerText, *Style))
+         formatIncremental(Code, CursorPos, TriggerText, Style))
       Result.push_back(replacementToEdit(Code, R));
     return CB(Result);
   };
